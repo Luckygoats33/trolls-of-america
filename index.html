@@ -266,7 +266,7 @@ const T=[
 let map,markers=[],aR='all';
 
 function init(){
-  map=L.map('map',{center:[39.5,-98.5],zoom:4,zoomControl:false,maxBounds:[[-5,-180],[72,-30]],minZoom:3,maxZoom:18});
+  map=L.map('map',{center:[39.5,-98.5],zoom:4,zoomControl:false,maxBounds:[[24,-126],[50,-66]],maxBoundsViscosity:1.0,minZoom:4,maxZoom:18});
   L.control.zoom({position:'bottomright'}).addTo(map);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
