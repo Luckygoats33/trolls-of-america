@@ -1,0 +1,721 @@
+<title>Dambo's Trolls of America</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&display=swap">
+
+<style>
+  :root {
+    --bg: #f7f2e8;
+    --fg: #2c2417;
+    --fg-muted: #8a7e6d;
+    --panel: #f0e9db;
+    --card: #fffcf5;
+    --card-border: #e4dcc8;
+    --accent: #4a6b35;
+    --accent-hover: #5c8342;
+    --permanent: #4a6b35;
+    --seasonal: #b48811;
+    --temporary: #c44b2b;
+    --planned: #6b7f96;
+    --ocean: #d6dfe8;
+    --land: #e8dfc8;
+    --land-stroke: #c4b99a;
+    --shadow-sm: 0 1px 4px rgba(44,36,23,0.08);
+    --shadow-md: 0 4px 16px rgba(44,36,23,0.12);
+    --shadow-lg: 0 8px 32px rgba(44,36,23,0.16);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1714;
+      --fg: #e0d8c8;
+      --fg-muted: #8a7e6d;
+      --panel: #231f19;
+      --card: #2a2520;
+      --card-border: #3a3428;
+      --accent: #6b9a4a;
+      --accent-hover: #7fb35a;
+      --permanent: #6b9a4a;
+      --seasonal: #d4a020;
+      --temporary: #e06040;
+      --planned: #8aa0b8;
+      --ocean: #1e2228;
+      --land: #2a2720;
+      --land-stroke: #3a3428;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.25);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.3);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a1714;
+    --fg: #e0d8c8;
+    --fg-muted: #8a7e6d;
+    --panel: #231f19;
+    --card: #2a2520;
+    --card-border: #3a3428;
+    --accent: #6b9a4a;
+    --accent-hover: #7fb35a;
+    --permanent: #6b9a4a;
+    --seasonal: #d4a020;
+    --temporary: #e06040;
+    --planned: #8aa0b8;
+    --ocean: #1e2228;
+    --land: #2a2720;
+    --land-stroke: #3a3428;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.25);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.3);
+    color-scheme: dark;
+  }
+
+  html { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    margin: 0;
+    min-height: 100%;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 32px 0 16px;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(28px, 5vw, 48px);
+    margin: 0;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+  .hero p {
+    color: var(--fg-muted);
+    font-size: 14px;
+    margin: 6px 0 0;
+    max-width: 50ch;
+    margin-inline: auto;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 0 8px;
+  }
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--fg-muted); color: var(--fg); }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--card)); }
+  .filter-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 8px 0 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+
+  /* Map container */
+  .map-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--ocean);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--card-border);
+  }
+  .map-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.75 / 1;
+  }
+  .map-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Region labels */
+  .region-label {
+    position: absolute;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: clamp(9px, 1.2vw, 14px);
+    font-style: italic;
+    color: var(--land-stroke);
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  /* Troll markers */
+  .marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .marker:hover, .marker:focus-visible {
+    transform: translate(-50%, -50%) scale(1.35);
+    z-index: 10;
+  }
+  .marker:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 50%; }
+  .marker-dot {
+    width: clamp(18px, 2.4vw, 28px);
+    height: clamp(18px, 2.4vw, 28px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(10px, 1.3vw, 15px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    border: 2px solid rgba(255,255,255,0.9);
+    position: relative;
+  }
+  .marker-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid;
+    border-color: inherit;
+    opacity: 0;
+    animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .marker-count {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 15px;
+    height: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+  }
+
+  /* Popup overlay */
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .popup-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .popup-card {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 520px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 24px max(20px, env(safe-area-inset-left, 0px)) calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .popup-overlay.open .popup-card {
+    transform: translateY(0);
+  }
+  .popup-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--card-border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .popup-card h2 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 24px;
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+  .popup-loc {
+    color: var(--fg-muted);
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+  .popup-desc {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .popup-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #fff;
+  }
+  .popup-tip {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--card-border);
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.5;
+  }
+  .popup-tip a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Troll list below map */
+  .troll-list-section {
+    max-width: 1100px;
+    margin: 32px auto;
+  }
+  .troll-list-section h2 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 24px;
+    margin: 0 0 16px;
+  }
+  .state-group {
+    margin-bottom: 20px;
+  }
+  .state-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--card-border);
+    margin-bottom: 8px;
+  }
+  .troll-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .troll-row:hover { background: var(--panel); }
+  .troll-row-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .troll-row-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .troll-row-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .troll-row-loc {
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+  .troll-row-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 16px 0 32px;
+    font-size: 12px;
+    color: var(--fg-muted);
+    line-height: 1.6;
+  }
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .footer a:hover { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marker-dot::after { animation: none; }
+    .popup-card, .popup-overlay { transition-duration: 0.01s; }
+    .marker { transition-duration: 0.01s; }
+  }
+</style>
+
+<div class="hero">
+  <h1>The <em>Trolls</em> of America</h1>
+  <p>Thomas Dambo's giant recycled-wood sculptures hidden across the United States. Click a troll to learn more.</p>
+</div>
+
+<div class="controls" id="controls"></div>
+<div class="stats-row" id="stats"></div>
+
+<div class="map-wrap">
+  <div class="map-inner" id="map">
+    <canvas class="map-canvas" id="canvas"></canvas>
+  </div>
+</div>
+
+<div class="troll-list-section" id="troll-list">
+  <h2>All Trolls by State</h2>
+</div>
+
+<div class="footer">
+  Locations sourced from public guides. Some trolls are seasonal or touring. Always confirm at <a href="https://thomasdambo.com" target="_blank" rel="noopener">thomasdambo.com</a> before visiting.
+</div>
+
+<div class="popup-overlay" id="popup" onclick="closePopup(event)">
+  <div class="popup-card" id="popup-card">
+    <div class="popup-handle"></div>
+    <div id="popup-content"></div>
+  </div>
+</div>
+
+<script>
+const TROLLS = [
+  { name: "Frankie Feetsplinters", state: "Washington", loc: "Ballard, Seattle", lat: 47.68, lng: -122.38, status: "permanent", desc: "A giant troll hiding among the trees in Seattle's Ballard neighborhood, one of the original Pacific Northwest six." },
+  { name: "Bruun Idun", state: "Washington", loc: "Lincoln Park, West Seattle", lat: 47.53, lng: -122.39, status: "permanent", desc: "Perched along the shores of Lincoln Park with sweeping views of Puget Sound." },
+  { name: "Pia the Peacekeeper", state: "Washington", loc: "Bainbridge Island", lat: 47.63, lng: -122.52, status: "permanent", desc: "A serene guardian of the forests of Bainbridge Island, accessible by ferry from Seattle." },
+  { name: "Oscar the Bird King", state: "Washington", loc: "Vashon Island", lat: 47.45, lng: -122.46, status: "permanent", desc: "A regal troll surrounded by birds on Vashon Island, crowned king of the feathered creatures." },
+  { name: "Jakob Two Trees", state: "Washington", loc: "Issaquah", lat: 47.53, lng: -122.03, status: "permanent", desc: "Nestled in the foothills near Issaquah, cradling two young trees in his enormous wooden arms." },
+  { name: "Trolls: A Field Study", state: "Washington", loc: "Tacoma / Eatonville", lat: 46.87, lng: -122.27, status: "temporary", desc: "A touring exhibit of 12 temporary trolls in Pierce County, running Oct 2026 through Jan 2027." },
+  { name: "Ole Bolle", state: "Oregon", loc: "Portland", lat: 45.51, lng: -122.68, status: "permanent", desc: "Portland's own troll, completing the original Pacific Northwest collection. A beloved local landmark." },
+  { name: "Rose Wonders", state: "California", loc: "Filoli Gardens, Woodside", lat: 37.47, lng: -122.31, status: "permanent", desc: "Residing in the stunning Filoli historic house and gardens south of San Francisco." },
+  { name: "Isak Heartstone", state: "Colorado", loc: "Breckenridge", lat: 39.48, lng: -106.04, status: "permanent", desc: "So wildly popular that he had to be relocated and rebuilt in a quieter spot in the mountains. Still iconic." },
+  { name: "Rita the Rock Planter", state: "Colorado", loc: "Victor", lat: 38.71, lng: -105.14, status: "permanent", desc: "A gentle troll tending to rocks high in the Colorado mountains near Cripple Creek." },
+  { name: "Mama Mimi", state: "Wyoming", loc: "Rendezvous Park, Wilson", lat: 43.50, lng: -110.87, status: "permanent", desc: "A motherly troll in the shadow of the Grand Tetons near Jackson Hole. Free to visit year-round." },
+  { name: "Long Leif", state: "Minnesota", loc: "Detroit Mountain, Detroit Lakes", lat: 46.84, lng: -95.86, status: "permanent", desc: "Dambo's biggest troll in the US, sprawling majestically across Detroit Mountain Recreation Area." },
+  { name: "Detroit Lakes Trolls", state: "Minnesota", loc: "Downtown Detroit Lakes", lat: 46.82, lng: -95.30, status: "permanent", desc: "Multiple trolls and magical portals scattered throughout the Detroit Lakes community." },
+  { name: "Clinton Trolls", state: "Iowa", loc: "Clinton", lat: 41.84, lng: -90.19, status: "permanent", desc: "Four giant trolls hidden throughout Clinton, including a secret fourth troll the locals keep hush about." },
+  { name: "Benny the Beard Fisher", state: "Michigan", loc: "Germfask", lat: 46.23, lng: -85.93, status: "permanent", desc: "Michigan's very first Dambo troll, at the Manistique River Campground in the Upper Peninsula." },
+  { name: "Mama Rosa", state: "Wisconsin", loc: "Wauwatosa", lat: 43.04, lng: -88.01, status: "permanent", desc: "A warm, welcoming troll in the Milwaukee suburb of Wauwatosa, built from locally reclaimed wood." },
+  { name: "Aullwood Trolls", state: "Ohio", loc: "Aullwood Audubon, Dayton", lat: 39.81, lng: -84.24, status: "seasonal", desc: "Trolls at the Aullwood Audubon nature sanctuary near Dayton. Check seasonal availability." },
+  { name: "Mama Loumari", state: "Kentucky", loc: "Bernheim Forest, Clermont", lat: 37.92, lng: -85.66, status: "permanent", desc: "The matriarch of the three-troll family in Bernheim Forest's enchanted woods." },
+  { name: "Little Nis", state: "Kentucky", loc: "Bernheim Forest, Clermont", lat: 37.90, lng: -85.63, status: "permanent", desc: "A small, mischievous troll hiding in the undergrowth of Bernheim Forest." },
+  { name: "Little Elina", state: "Kentucky", loc: "Bernheim Forest, Clermont", lat: 37.93, lng: -85.69, status: "permanent", desc: "The youngest of the Bernheim Forest troll family, tucked away on a quiet trail." },
+  { name: "Blackberry Mountain Troll", state: "Tennessee", loc: "Walland", lat: 35.72, lng: -83.80, status: "permanent", desc: "A hidden troll at the luxury Blackberry Mountain resort in the Smoky Mountains." },
+  { name: "Mama Zelda's Hair", state: "Alabama", loc: "Huntsville", lat: 34.73, lng: -86.59, status: "permanent", desc: "A wild-haired troll in Rocket City, one of the southernmost Dambo installations." },
+  { name: "NC Arboretum Trolls", state: "North Carolina", loc: "Asheville", lat: 35.50, lng: -82.61, status: "seasonal", desc: "A large seasonal installation of trolls at the North Carolina Arboretum in the Blue Ridge Mountains." },
+  { name: "Dix Park Trolls", state: "North Carolina", loc: "Raleigh", lat: 35.77, lng: -78.65, status: "planned", desc: "Five trolls planned for Dorothea Dix Park as part of a seven-troll NC installation." },
+  { name: "High Point Troll", state: "North Carolina", loc: "High Point", lat: 35.96, lng: -80.01, status: "planned", desc: "One troll planned for the furniture capital of the world." },
+  { name: "Charlotte Troll", state: "North Carolina", loc: "Charlotte", lat: 35.23, lng: -80.84, status: "planned", desc: "One troll planned for the Queen City as part of a statewide Dambo installation." },
+  { name: "Joen & the Giant Beetle", state: "Florida", loc: "Wynwood, Miami", lat: 25.80, lng: -80.20, status: "permanent", desc: "A troll riding a giant beetle in Miami's vibrant Wynwood arts district. Free to visit anytime." },
+  { name: "Malin's Fountain", state: "Texas", loc: "Austin", lat: 30.27, lng: -97.74, status: "permanent", desc: "A whimsical fountain troll bringing magic to the Live Music Capital of the World." },
+  { name: "Big Rusty", state: "New Jersey", loc: "Hainesport Township", lat: 39.97, lng: -74.83, status: "permanent", desc: "Standing guard at the future site of Creek Turn Park in southern New Jersey." },
+  { name: "TROLLS: Save the Humans", state: "New York", loc: "The Wild Center, Tupper Lake", lat: 44.23, lng: -74.56, status: "seasonal", desc: "Six trolls return to The Wild Center in the Adirondacks every summer, June through October." },
+  { name: "Coastal Maine Trolls", state: "Maine", loc: "Boothbay", lat: 43.88, lng: -69.63, status: "seasonal", desc: "Trolls at the beloved Coastal Maine Botanical Gardens, a seasonal favorite." },
+  { name: "North Kingstown Troll", state: "Rhode Island", loc: "North Kingstown", lat: 41.55, lng: -71.46, status: "permanent", desc: "One of three new trolls built in Rhode Island as part of the expanding Troll Map project." },
+  { name: "East Providence Troll", state: "Rhode Island", loc: "East Providence", lat: 41.81, lng: -71.36, status: "permanent", desc: "A recycled-wood giant standing tall on the east side of Providence." },
+  { name: "Arcadia Troll", state: "Rhode Island", loc: "Arcadia Management Area", lat: 41.59, lng: -71.74, status: "permanent", desc: "Hidden deep in the trails of Arcadia Management Area in southern Rhode Island." },
+  { name: "McKean County Trolls", state: "Pennsylvania", loc: "Kane / Bradford area", lat: 41.76, lng: -78.76, status: "planned", desc: "Three trolls planned for northwest Pennsylvania's Allegheny National Forest region, opening 2027." },
+];
+
+const STATUS = {
+  permanent: { label: "Permanent", color: "var(--permanent)", emoji: "🧌" },
+  seasonal:  { label: "Seasonal",  color: "var(--seasonal)",  emoji: "🌿" },
+  temporary: { label: "Touring",   color: "var(--temporary)", emoji: "⏳" },
+  planned:   { label: "Planned",   color: "var(--planned)",   emoji: "📌" },
+};
+
+const BOUNDS = { latN: 50, latS: 24, lngW: -125, lngE: -66 };
+let activeFilter = null;
+
+function project(lat, lng) {
+  return {
+    x: (lng - BOUNDS.lngW) / (BOUNDS.lngE - BOUNDS.lngW) * 100,
+    y: (BOUNDS.latN - lat) / (BOUNDS.latN - BOUNDS.latS) * 100
+  };
+}
+
+function drawMap() {
+  const canvas = document.getElementById('canvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ocean').trim();
+  ctx.fillRect(0, 0, w, h);
+
+  const outline = [
+    [-124.7,48.4],[-124.2,46.3],[-124.4,43.4],[-124.3,42.0],[-124.3,40.0],
+    [-123.3,38.5],[-122.5,37.8],[-122.0,36.6],[-121.0,35.5],[-120.5,34.5],
+    [-118.4,33.8],[-117.1,32.5],[-114.7,32.7],[-111.0,31.3],[-108.2,31.3],
+    [-106.4,31.8],[-104.4,29.8],[-103.0,29.5],[-100.0,28.0],[-97.2,26.0],
+    [-97.4,27.8],[-96.0,28.5],[-95.0,29.5],[-93.8,29.8],[-91.5,29.4],
+    [-89.5,30.0],[-88.8,30.4],[-88.0,30.2],[-87.5,30.3],[-86.5,30.5],
+    [-85.5,30.0],[-85.0,29.7],[-84.0,29.5],[-83.0,29.0],[-82.5,27.5],
+    [-81.8,26.0],[-80.5,25.1],[-80.0,26.5],[-80.1,28.5],[-81.3,30.5],
+    [-81.0,31.5],[-80.8,32.0],[-79.5,33.0],[-78.5,33.8],[-77.5,34.5],
+    [-76.0,35.0],[-75.5,35.5],[-75.8,37.0],[-76.3,37.5],[-76.0,38.0],
+    [-75.5,38.5],[-75.0,39.0],[-74.2,39.5],[-74.0,40.5],[-73.7,40.7],
+    [-72.0,41.0],[-71.4,41.5],[-70.5,41.8],[-70.0,42.0],[-70.5,43.0],
+    [-69.0,44.0],[-67.0,44.8],[-67.0,47.2],[-69.0,47.4],[-71.5,45.0],
+    [-74.0,45.0],[-76.5,44.0],[-79.0,43.3],[-79.0,42.5],[-82.5,42.0],
+    [-83.5,42.0],[-84.0,41.7],[-84.8,41.7],[-84.8,42.5],[-83.0,43.5],
+    [-82.5,44.5],[-82.5,45.5],[-83.5,46.0],[-84.5,46.5],[-85.0,46.8],
+    [-86.5,46.5],[-87.5,46.5],[-88.0,47.0],[-89.5,47.0],[-90.5,47.5],
+    [-91.5,47.0],[-92.0,46.8],[-92.5,46.0],[-92.0,45.5],[-90.0,44.0],
+    [-87.5,43.5],[-87.5,42.5],[-87.8,42.0],[-87.5,41.7],[-87.0,42.0],
+    [-86.5,42.0],[-86.0,42.0],[-84.8,41.7],[-84.0,41.7],[-83.5,42.0],
+    [-82.5,42.0],[-79.0,42.5],[-79.0,43.3],[-76.5,44.0],
+    [-76.5,43.5],[-76.0,43.5],[-75.5,44.5],[-74.0,45.0],[-71.5,45.0],
+    [-69.0,47.4],[-67.0,47.2],[-67.0,44.8]
+  ];
+
+  // This outline is rough — draw just the main perimeter
+  const simplified = [
+    [-124.7,48.4],[-124.2,46.3],[-124.4,42.0],[-124.3,40.0],
+    [-122.5,37.8],[-121.0,35.5],[-120.0,34.0],[-117.1,32.5],
+    [-114.7,32.7],[-111.0,31.3],[-106.4,31.8],[-104.4,29.8],
+    [-100.0,28.0],[-97.2,26.0],[-97.4,27.8],[-95.0,29.5],
+    [-89.5,30.0],[-85.5,30.0],[-83.0,29.0],[-82.0,27.0],
+    [-80.5,25.1],[-80.0,27.0],[-81.3,30.5],[-80.8,32.0],
+    [-78.5,33.8],[-75.5,35.5],[-75.5,38.5],[-74.0,40.5],
+    [-71.5,41.3],[-70.0,42.0],[-67.0,44.8],[-67.0,47.2],
+    [-71.5,45.0],[-74.0,45.0],[-79.0,43.3],[-82.5,42.0],
+    [-87.5,42.0],[-87.8,44.0],[-84.5,46.5],[-88.0,47.0],
+    [-92.0,46.8],[-92.5,48.5],[-95.0,49.0],[-104.0,49.0],
+    [-117.0,49.0],[-122.5,48.5],[-124.7,48.4]
+  ];
+
+  function toCanvas(lng, lat) {
+    const px = project(lat, lng);
+    return [px.x / 100 * w, px.y / 100 * h];
+  }
+
+  ctx.beginPath();
+  const [sx, sy] = toCanvas(simplified[0][0], simplified[0][1]);
+  ctx.moveTo(sx, sy);
+  for (let i = 1; i < simplified.length; i++) {
+    const [cx, cy] = toCanvas(simplified[i][0], simplified[i][1]);
+    ctx.lineTo(cx, cy);
+  }
+  ctx.closePath();
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--land').trim();
+  ctx.fill();
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--land-stroke').trim();
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function createMarkers() {
+  const mapEl = document.getElementById('map');
+  document.querySelectorAll('.marker').forEach(m => m.remove());
+  document.querySelectorAll('.region-label').forEach(l => l.remove());
+
+  const groups = {};
+  TROLLS.forEach((t, i) => {
+    if (activeFilter && t.status !== activeFilter) return;
+    const p = project(t.lat, t.lng);
+    const key = Math.round(p.x / 3) + ',' + Math.round(p.y / 3);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push({ ...t, idx: i, px: p.x, py: p.y });
+  });
+
+  Object.values(groups).forEach(group => {
+    const cx = group.reduce((s, t) => s + t.px, 0) / group.length;
+    const cy = group.reduce((s, t) => s + t.py, 0) / group.length;
+    const primary = group[0];
+    const s = STATUS[primary.status];
+
+    const el = document.createElement('button');
+    el.className = 'marker';
+    el.style.left = cx + '%';
+    el.style.top = cy + '%';
+    el.setAttribute('aria-label', group.length > 1 ? group.length + ' trolls near ' + primary.loc : primary.name);
+    el.innerHTML = `<div class="marker-dot" style="background:${s.color};border-color:${s.color}">${s.emoji}${group.length > 1 ? '<span class="marker-count">' + group.length + '</span>' : ''}</div>`;
+
+    el.addEventListener('click', () => showPopup(group));
+    mapEl.appendChild(el);
+  });
+
+  const regions = [
+    { label: "Pacific Northwest", x: 5, y: 8 },
+    { label: "Mountain West", x: 22, y: 28 },
+    { label: "Midwest", x: 52, y: 22 },
+    { label: "Northeast", x: 80, y: 18 },
+    { label: "Southeast", x: 68, y: 55 },
+    { label: "Southwest", x: 30, y: 65 },
+  ];
+  regions.forEach(r => {
+    const lbl = document.createElement('div');
+    lbl.className = 'region-label';
+    lbl.style.left = r.x + '%';
+    lbl.style.top = r.y + '%';
+    lbl.textContent = r.label;
+    mapEl.appendChild(lbl);
+  });
+}
+
+function showPopup(trolls) {
+  const el = document.getElementById('popup');
+  const content = document.getElementById('popup-content');
+  const html = trolls.map(t => {
+    const s = STATUS[t.status];
+    return `
+      <h2>${t.name}</h2>
+      <div class="popup-loc">${t.loc}, ${t.state}</div>
+      <div class="popup-desc">${t.desc}</div>
+      <div class="popup-status" style="background:${s.color}">${s.emoji} ${s.label}</div>
+      ${trolls.length > 1 && t !== trolls[trolls.length - 1] ? '<hr style="border:none;border-top:1px solid var(--card-border);margin:18px 0">' : ''}
+    `;
+  }).join('');
+  content.innerHTML = html + '<div class="popup-tip">Confirm hours and directions at <a href="https://thomasdambo.com" target="_blank" rel="noopener">thomasdambo.com</a> before visiting.</div>';
+  el.classList.add('open');
+}
+
+function closePopup(e) {
+  if (e.target === document.getElementById('popup')) {
+    document.getElementById('popup').classList.remove('open');
+  }
+}
+
+function buildControls() {
+  const el = document.getElementById('controls');
+  const allBtn = `<button class="filter-btn${!activeFilter ? ' active' : ''}" onclick="setFilter(null)">All Trolls</button>`;
+  const statusBtns = Object.entries(STATUS).map(([key, s]) =>
+    `<button class="filter-btn${activeFilter === key ? ' active' : ''}" onclick="setFilter('${key}')"><span class="filter-dot" style="background:${s.color}"></span>${s.label}</button>`
+  ).join('');
+  el.innerHTML = allBtn + statusBtns;
+}
+
+function setFilter(key) {
+  activeFilter = key;
+  buildControls();
+  createMarkers();
+  buildList();
+}
+
+function buildStats() {
+  const visible = TROLLS.filter(t => !activeFilter || t.status === activeFilter);
+  const states = new Set(visible.map(t => t.state)).size;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-item"><div class="stat-num">${visible.length}</div><div class="stat-label">Trolls</div></div>
+    <div class="stat-item"><div class="stat-num">${states}</div><div class="stat-label">States</div></div>
+    <div class="stat-item"><div class="stat-num">${visible.filter(t => t.status === 'permanent').length}</div><div class="stat-label">Permanent</div></div>
+  `;
+}
+
+function buildList() {
+  const section = document.getElementById('troll-list');
+  const heading = section.querySelector('h2');
+  section.innerHTML = '';
+  section.appendChild(heading);
+  buildStats();
+
+  const filtered = TROLLS.filter(t => !activeFilter || t.status === activeFilter);
+  const byState = {};
+  filtered.forEach(t => {
+    if (!byState[t.state]) byState[t.state] = [];
+    byState[t.state].push(t);
+  });
+
+  Object.keys(byState).sort().forEach(state => {
+    const group = document.createElement('div');
+    group.className = 'state-group';
+    group.innerHTML = `<div class="state-name">${state}</div>` +
+      byState[state].map(t => {
+        const s = STATUS[t.status];
+        return `<div class="troll-row" onclick='showPopup(${JSON.stringify([t]).replace(/'/g,"&#39;")})'>
+          <span class="troll-row-dot" style="background:${s.color}"></span>
+          <div class="troll-row-text">
+            <div class="troll-row-name">${t.name}</div>
+            <div class="troll-row-loc">${t.loc}</div>
+          </div>
+          <span class="troll-row-badge" style="background:${s.color}">${s.label}</span>
+        </div>`;
+      }).join('');
+    section.appendChild(group);
+  });
+}
+
+function init() {
+  drawMap();
+  buildControls();
+  buildStats();
+  createMarkers();
+  buildList();
+  window.addEventListener('resize', () => { drawMap(); });
+  const ro = new ResizeObserver(() => drawMap());
+  ro.observe(document.getElementById('canvas').parentElement);
+}
+
+init();
+</script>
